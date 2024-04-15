@@ -1,6 +1,6 @@
 # LeverWTF
 
-Contracts for LeverWTF.
+Contracts for LeverWTF
 
 # General Overview
 
