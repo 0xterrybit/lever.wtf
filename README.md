@@ -1,6 +1,6 @@
-# GMX Synthetics
+# LeverWTF
 
-Contracts for GMX Synthetics.
+Contracts for LeverWTF.
 
 # General Overview
 
