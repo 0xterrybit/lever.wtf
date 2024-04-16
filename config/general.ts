@@ -1,5 +1,5 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { decimalToFloat, expandDecimals } from "../utils/math";
+import { decimalToFloat, percentageToFloat, expandDecimals } from "../utils/math";
 
 export default async function ({ network }: HardhatRuntimeEnvironment) {
   if (network.name === "hardhat") {
@@ -48,8 +48,7 @@ export default async function ({ network }: HardhatRuntimeEnvironment) {
   const generalConfig = {
     feeReceiver: "0x43ce1d475e06c65dd879f4ec644b8e0e10ff2b6d",
     holdingAddress: "0x3f59203ea1c66527422998b54287e1efcacbe2c5",
-    maxUiFeeFactor: decimalToFloat(2, 4),           // 0.0002, 0.02%
-    
+    maxUiFeeFactor: percentageToFloat("0.05%"),
     minHandleExecutionErrorGas: 1_200_000,
     minHandleExecutionErrorGasToForward: 1_000_000, // measured gas required for an order cancellation: ~600,000
     minAdditionalGasForExecution: 1_000_000,
@@ -58,19 +57,19 @@ export default async function ({ network }: HardhatRuntimeEnvironment) {
     depositGasLimitMultiple: 1_800_000,
     withdrawalGasLimit: 1_500_000,
 
-    singleSwapGasLimit: 1_000_000,        // 测量的 gas for a swap in a market increase order: ~600,000
-    increaseOrderGasLimit: 4_000_000,     // increaseOrder
-    decreaseOrderGasLimit: 4_000_000,     // decreaseOrder
-    swapOrderGasLimit: 3_000_000,         // swapOrder
+    singleSwapGasLimit: 1_000_000, // measured gas required for a swap in a market increase order: ~600,000
+    increaseOrderGasLimit: 4_000_000,
+    decreaseOrderGasLimit: 4_000_000,
+    swapOrderGasLimit: 3_000_000,
 
     tokenTransferGasLimit: 200_000,
     nativeTokenTransferGasLimit: 50_000,
 
-    estimatedGasFeeBaseAmount: 500_000,   // measured gas for an order execution without any main logic: ~500,000
-    estimatedGasFeeMultiplierFactor: expandDecimals(1, 30), // 1x,  估计 GasFee 乘数
+    estimatedGasFeeBaseAmount: 500_000, // measured gas for an order execution without any main logic: ~500,000
+    estimatedGasFeeMultiplierFactor: expandDecimals(1, 30), // 1x
 
     executionGasFeeBaseAmount: 500_000, // measured gas for an order execution without any main logic: ~500,000
-    executionGasFeeMultiplierFactor: expandDecimals(1, 30), // 1x,  执行 Gas 费乘数
+    executionGasFeeMultiplierFactor: expandDecimals(1, 30), // 1x
 
     maxSwapPathLength: 3,
     maxCallbackGasLimit: 2_000_000,
@@ -79,9 +78,9 @@ export default async function ({ network }: HardhatRuntimeEnvironment) {
     minPositionSizeUsd: decimalToFloat(1),
     claimableCollateralTimeDivisor: 60 * 60,
 
-    positionFeeReceiverFactor: decimalToFloat(37, 2),   // 37%
-    swapFeeReceiverFactor: decimalToFloat(37, 2),       // 37%
-    borrowingFeeReceiverFactor: decimalToFloat(37, 2),  // 37%
+    positionFeeReceiverFactor: decimalToFloat(37, 2), // 37%
+    swapFeeReceiverFactor: decimalToFloat(37, 2), // 37%
+    borrowingFeeReceiverFactor: decimalToFloat(37, 2), // 37%
 
     skipBorrowingFeeForSmallerSide: true,
   };
@@ -90,13 +89,17 @@ export default async function ({ network }: HardhatRuntimeEnvironment) {
     arbitrumGoerli: {
       requestExpirationBlockAge: 1200, // about 5 minutes assuming 4 blocks per second
     },
+    arbitrumSepolia: {
+      requestExpirationBlockAge: 1200, // about 5 minutes assuming 4 blocks per second
+    },
     avalancheFuji: {
       requestExpirationBlockAge: 150, // about 5 minutes assuming 1 block per 2 seconds
     },
     arbitrum: {
+      maxCallbackGasLimit: 3_000_000,
       requestExpirationBlockAge: 1200, // about 5 minutes assuming 4 blocks per second
-      estimatedGasFeeBaseAmount: 6_000_000,
-      executionGasFeeBaseAmount: 6_000_000,
+      estimatedGasFeeBaseAmount: false,
+      executionGasFeeBaseAmount: false,
     },
     avalanche: {
       requestExpirationBlockAge: 150, // about 5 minutes assuming 1 block per 2 seconds

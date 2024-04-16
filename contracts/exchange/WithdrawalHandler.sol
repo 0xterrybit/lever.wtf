@@ -49,13 +49,7 @@ contract WithdrawalHandler is IWithdrawalHandler, GlobalReentrancyGuard, RoleMod
     function createWithdrawal(
         address account,
         WithdrawalUtils.CreateWithdrawalParams calldata params
-    ) 
-        external
-        override
-        globalNonReentrant
-        onlyController
-        returns (bytes32)
-    {
+    ) external override globalNonReentrant onlyController returns (bytes32) {
         FeatureUtils.validateFeature(dataStore, Keys.createWithdrawalFeatureDisabledKey(address(this)));
 
         return WithdrawalUtils.createWithdrawal(
@@ -69,12 +63,7 @@ contract WithdrawalHandler is IWithdrawalHandler, GlobalReentrancyGuard, RoleMod
 
     // @dev cancels a withdrawal
     // @param key the withdrawal key
-    function cancelWithdrawal(bytes32 key)
-        external
-        override
-        globalNonReentrant
-        onlyController
-    {
+    function cancelWithdrawal(bytes32 key) external override globalNonReentrant onlyController {
         uint256 startingGas = gasleft();
 
         DataStore _dataStore = dataStore;
@@ -221,6 +210,7 @@ contract WithdrawalHandler is IWithdrawalHandler, GlobalReentrancyGuard, RoleMod
             OracleUtils.isOracleError(errorSelector) ||
             errorSelector == Errors.DisabledFeature.selector
         ) {
+
             ErrorUtils.revertWithCustomError(reasonBytes);
         }
 

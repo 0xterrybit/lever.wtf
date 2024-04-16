@@ -46,38 +46,23 @@ library DecreasePositionUtils {
     // in a market. It takes a PositionUtils.UpdatePositionParams object as an input, which
     // includes information about the position to be decreased, the market in
     // which the position exists, and the order that is being used to decrease the position.
-    // DecreasePosition 函数 减少市场中 现有头寸的规模。
-    // 它采用 PositionUtils.UpdatePositionParams 对象作为输入， 
-    // 包含有关要减少的头寸、该头寸所在的市场 以及用于减少头寸的订单的信息。
-
     //
     // The function first calculates the prices of the tokens in the market, and then
     // checks whether the position is liquidatable based on the current market prices.
     // If the order is a liquidation order and the position is not liquidatable, the function reverts.
-    // 该函数首先计算市场上代币的价格，
-    // 然后 根据当前市场价格检查仓位是否可以平仓。 
-    // 如果订单是强平订单且仓位不可强平，则函数恢复。
-
     //
     // If there is not enough collateral in the position to complete the decrease,
     // the function reverts. Otherwise, the function updates the position's size and
     // collateral amount, and increments the claimable funding amount for
     // the market if necessary.
-    // 如果头寸中没有足够的抵押品来完成减少， 函数将恢复。 
-    // 否则，该函数将更新头寸规模和 抵押品金额，
-    // 并在必要时增加 市场的可索赔资金金额。
-
     //
     // Finally, the function returns a DecreasePositionResult object containing
     // information about the outcome of the decrease operation, including the amount
     // of collateral removed from the position and any fees that were paid.
-    // 最后，该函数返回一个 DecreasePositionResult 对象，
-    // 其中包含 有关减少操作结果的信息，包括从头寸中移除的抵押品数量以及支付的任何费用。
     // @param params PositionUtils.UpdatePositionParams
     function decreasePosition(
         PositionUtils.UpdatePositionParams memory params
     ) external returns (DecreasePositionResult memory) {
-
         PositionUtils.DecreasePositionCache memory cache;
 
         cache.prices = MarketUtils.getMarketPrices(
@@ -92,9 +77,7 @@ library DecreasePositionUtils {
         );
 
         // cap the order size to the position size
-        // 将订单大小限制为头寸大小
         if (params.order.sizeDeltaUsd() > params.position.sizeInUsd()) {
-
             if (params.order.orderType() == Order.OrderType.LimitDecrease ||
                 params.order.orderType() == Order.OrderType.StopLossDecrease) {
 
@@ -106,14 +89,12 @@ library DecreasePositionUtils {
                 );
 
                 params.order.setSizeDeltaUsd(params.position.sizeInUsd());
-
             } else {
                 revert Errors.InvalidDecreaseOrderSize(params.order.sizeDeltaUsd(), params.position.sizeInUsd());
             }
         }
 
         // cap the initialCollateralDeltaAmount to the position collateralAmount
-        // 将初始抵押品增量 金额限制为 头寸抵押品金额
         if (params.order.initialCollateralDeltaAmount() > params.position.collateralAmount()) {
             OrderEventUtils.emitOrderCollateralDeltaAmountAutoUpdated(
                 params.contracts.eventEmitter,
@@ -276,7 +257,6 @@ library DecreasePositionUtils {
         params.position.setCollateralAmount(values.remainingCollateralAmount);
         params.position.setDecreasedAtBlock(Chain.currentBlockNumber());
 
-        // 增加 可索赔 资金金额
         PositionUtils.incrementClaimableFundingAmount(params, fees);
 
         if (params.position.sizeInUsd() == 0 || params.position.sizeInTokens() == 0) {
@@ -307,7 +287,6 @@ library DecreasePositionUtils {
             -(cache.initialCollateralAmount - params.position.collateralAmount()).toInt256()
         );
 
-        // 更新 未平仓 合约
         PositionUtils.updateOpenInterest(
             params,
             -params.order.sizeDeltaUsd().toInt256(),
@@ -317,14 +296,10 @@ library DecreasePositionUtils {
         // affiliate rewards are still distributed even if the order is a liquidation order
         // this is expected as a partial liquidation is considered the same as an automatic
         // closing of a position
-        // 即使订单是清算订单，Referral 奖励 仍然会分配 
-        // 因为部分清算被认为 automatic closing of position
         PositionUtils.handleReferral(params, fees);
 
         // validatePosition should be called after open interest and all other market variables
         // have been updated
-        // validatePosition 应在 未平仓合约 和 所有其他市场变量 
-        // 已更新后调用
         if (params.position.sizeInUsd() != 0 || params.position.sizeInTokens() != 0) {
             // validate position which validates liquidation state is only called
             // if the remaining position size is not zero
@@ -335,11 +310,6 @@ library DecreasePositionUtils {
             // the only difference is that if the position has insufficient / negative
             // collateral a liquidation transaction should still complete
             // while a manual close transaction should revert
-            // 仅当剩余头寸大小不为零时 才调用验证清算状态的验证头寸 
-            // 因此，如果 处于部分可清算状态，用户仍然可以手动平仓 
-            // 这不应该导致任何问题，因为清算与自动平仓相同 
-            // 唯一的区别是，如果头寸没有足够/负数 抵押品，清算交易仍应完成 
-            // 而手动平仓交易应恢复
             PositionUtils.validatePosition(
                 params.contracts.dataStore,
                 params.contracts.referralStorage,

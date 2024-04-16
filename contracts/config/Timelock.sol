@@ -449,7 +449,11 @@ contract Timelock is ReentrancyGuard, RoleModule, BasicMulticall {
         eventData.stringItems.initItems(1);
         eventData.stringItems.setItem(0, "actionLabel", actionLabel);
 
-        eventEmitter.emitEventLog1("SignalPendingAction", actionKey, eventData);
+        eventEmitter.emitEventLog1(
+            "SignalPendingAction",
+            actionKey,
+            eventData
+        );
     }
 
     // @dev the key for the addOracleSigner action
@@ -542,7 +546,11 @@ contract Timelock is ReentrancyGuard, RoleModule, BasicMulticall {
         eventData.stringItems.initItems(1);
         eventData.stringItems.setItem(0, "actionLabel", actionLabel);
 
-        eventEmitter.emitEventLog1("ClearPendingAction", actionKey, eventData);
+        eventEmitter.emitEventLog1(
+            "ClearPendingAction",
+            actionKey,
+            eventData
+        );
     }
 
     function _validateTimelockDelay() internal view {

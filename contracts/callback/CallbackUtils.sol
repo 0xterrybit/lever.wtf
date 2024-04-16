@@ -48,16 +48,10 @@ library CallbackUtils {
     // this is to prevent callback gas limits which are larger than the max gas limits per block
     // as this would allow for callback contracts that can consume all gas and conditionally cause
     // executions to fail
-    // 验证 callbackGasLimit 小于最大指定值 
-    // 这是为了防止 callbackGasLimit 大于每个块的最大gas限制 
-    // 因为这将 callbackGasLimit 可以消耗所有gas并有 导致 执行失败
-
     // @param dataStore DataStore
     // @param callbackGasLimit the callback gas limit
     function validateCallbackGasLimit(DataStore dataStore, uint256 callbackGasLimit) internal view {
-
         uint256 maxCallbackGasLimit = dataStore.getUint(Keys.MAX_CALLBACK_GAS_LIMIT);
-        
         if (callbackGasLimit > maxCallbackGasLimit) {
             revert Errors.MaxCallbackGasLimitExceeded(callbackGasLimit, maxCallbackGasLimit);
         }

@@ -273,19 +273,14 @@ library MarketUtils {
     // @param maximize whether to maximize or minimize the pool value
     // @return the value information of a pool
     function getPoolValueInfo(
-
         DataStore dataStore,
         Market.Props memory market,
-
         Price.Props memory indexTokenPrice,
         Price.Props memory longTokenPrice,
         Price.Props memory shortTokenPrice,
-
         bytes32 pnlFactorType,
         bool maximize
-
     ) public view returns (MarketPoolValueInfo.Props memory) {
-
         MarketPoolValueInfo.Props memory result;
 
         result.longTokenAmount = getPoolAmount(dataStore, market, market.longToken);
@@ -333,8 +328,8 @@ library MarketUtils {
             dataStore,
             market,
             indexTokenPrice,
-            true,           // isLong
-            !maximize       // maximize
+            true, // isLong
+            !maximize // maximize
         );
 
         result.longPnl = getCappedPnl(
@@ -350,8 +345,8 @@ library MarketUtils {
             dataStore,
             market,
             indexTokenPrice,
-            false,              // isLong
-            !maximize           // maximize
+            false, // isLong
+            !maximize // maximize
         );
 
         result.shortPnl = getCappedPnl(
@@ -1393,7 +1388,6 @@ library MarketUtils {
         MarketPrices memory prices,
         bool isLong
     ) external {
-        
         (/* uint256 nextCumulativeBorrowingFactor */, uint256 delta) = getNextCumulativeBorrowingFactor(
             dataStore,
             market,

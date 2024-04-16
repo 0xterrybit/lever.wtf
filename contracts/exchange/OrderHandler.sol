@@ -38,7 +38,6 @@ contract OrderHandler is IOrderHandler, BaseOrderHandler {
         address account,
         IBaseOrderUtils.CreateOrderParams calldata params
     ) external override globalNonReentrant onlyController returns (bytes32) {
-        
         FeatureUtils.validateFeature(dataStore, Keys.createOrderFeatureDisabledKey(address(this), uint256(params.orderType)));
 
         return OrderUtils.createOrder(
@@ -128,12 +127,7 @@ contract OrderHandler is IOrderHandler, BaseOrderHandler {
      *
      * @param key The unique ID of the order to be cancelled
      */
-    function cancelOrder(bytes32 key)
-        external
-        override
-        globalNonReentrant
-        onlyController
-    {
+    function cancelOrder(bytes32 key) external override globalNonReentrant onlyController {
         uint256 startingGas = gasleft();
 
         DataStore _dataStore = dataStore;
@@ -235,16 +229,10 @@ contract OrderHandler is IOrderHandler, BaseOrderHandler {
             startingGas,
             Order.SecondaryOrderType.None
         );
-
         // limit swaps require frozen order keeper for execution since on creation it can fail due to output amount
         // which would automatically cause the order to be frozen
         // limit increase and limit / trigger decrease orders may fail due to output amount as well and become frozen
         // but only if their acceptablePrice is reached
-        // 限价掉期需要冻结订单管理员才能执行，
-        // 因为在创建时它可能会因输出量而失败 
-        // 这将自动导致订单被冻结 
-        // 限价增加和限价/触发减少订单也可能因输出量而失败并被冻结
-        // 但前提是达到了可接受的价格
         if (params.order.isFrozen() || params.order.orderType() == Order.OrderType.LimitSwap) {
             _validateFrozenOrderKeeper(keeper);
         }
@@ -264,7 +252,6 @@ contract OrderHandler is IOrderHandler, BaseOrderHandler {
         uint256 startingGas,
         bytes memory reasonBytes
     ) internal {
-
         GasUtils.validateExecutionErrorGas(dataStore, reasonBytes);
 
         bytes4 errorSelector = ErrorUtils.getErrorSelectorFromData(reasonBytes);
@@ -274,8 +261,7 @@ contract OrderHandler is IOrderHandler, BaseOrderHandler {
 
         if (
             OracleUtils.isOracleError(errorSelector) ||
-            // if the order is already frozen, 
-            // revert with the custom error to provide more information
+            // if the order is already frozen, revert with the custom error to provide more information
             // on why the order cannot be executed
             order.isFrozen() ||
             // for market orders, the EmptyPosition error should still lead to the
@@ -329,16 +315,17 @@ contract OrderHandler is IOrderHandler, BaseOrderHandler {
             return;
         }
 
-        // 冻结无法履行的订单以防止订单系统被操纵 
-        // 操纵的一个例子是，如果用户创建限价订单 
-        // 其大小大于池中的可用金额 
-        // 用户等待其限价被触及，如果价格 
-        // 之后走势对他们有利，他们可以存入资金池 
-        // 以允许执行订单，然后关闭订单以获取利润
+        // freeze unfulfillable orders to prevent the order system from being gamed
+        // an example of gaming would be if a user creates a limit order
+        // with size greater than the available amount in the pool
+        // the user waits for their limit price to be hit, and if price
+        // moves in their favour after, they can deposit into the pool
+        // to allow the order to be executed then close the order for a profit
         //
-        // 仅当最新价格与触发价格匹配时，冻结订单管理员才会执行订单 
-        // 
-        // 用户也可以调用 updateOrder 来解冻订单
+        // frozen order keepers are expected to execute orders only if the
+        // latest prices match the trigger price
+        //
+        // a user can also call updateOrder to unfreeze an order
         OrderUtils.freezeOrder(
             dataStore,
             eventEmitter,

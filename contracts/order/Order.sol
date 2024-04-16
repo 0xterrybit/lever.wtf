@@ -15,46 +15,37 @@ library Order {
         MarketSwap,
         // @dev LimitSwap: swap token A to token B if the minOutputAmount can be fulfilled
         LimitSwap,
-        
         // @dev MarketIncrease: increase position at the current market price
         // the order will be cancelled if the position cannot be increased at the acceptablePrice
         MarketIncrease,
         // @dev LimitIncrease: increase position if the triggerPrice is reached and the acceptablePrice can be fulfilled
         LimitIncrease,
-        
         // @dev MarketDecrease: decrease position at the current market price
         // the order will be cancelled if the position cannot be decreased at the acceptablePrice
         MarketDecrease,
         // @dev LimitDecrease: decrease position if the triggerPrice is reached and the acceptablePrice can be fulfilled
         LimitDecrease,
-
         // @dev StopLossDecrease: decrease position if the triggerPrice is reached and the acceptablePrice can be fulfilled
-        // 如果达到 triggerPrice 并且可以满足 acceptablePrice 则减少仓位
         StopLossDecrease,
         // @dev Liquidation: allows liquidation of positions if the criteria for liquidation are met
-        // 如果满足清算标准，则允许清算头寸
         Liquidation
     }
 
     // to help further differentiate orders
-    // 帮助进一步区分订单
     enum SecondaryOrderType {
         None,
         Adl
     }
 
     enum DecreasePositionSwapType {
-        NoSwap,                                 // Noswap
-        SwapPnlTokenToCollateralToken,          // 获利 Token 转 抵押品 Token
-        SwapCollateralTokenToPnlToken           // 抵押品 Token 转 获利 Token
+        NoSwap,
+        SwapPnlTokenToCollateralToken,
+        SwapCollateralTokenToPnlToken
     }
 
     // @dev there is a limit on the number of fields a struct can have when being passed
     // or returned as a memory variable which can cause "Stack too deep" errors
     // use sub-structs to avoid this issue
-    // 结构在传递 或 作为内存变量返回时 可以拥有的字段数量有限制，
-    // 这可能会导致“堆栈太深”错误 
-    // 使用子结构来避免此问题
     // @param addresses address values
     // @param numbers number values
     // @param flags boolean values
@@ -98,12 +89,8 @@ library Order {
     // is the amount of the initialCollateralToken sent in by the user
     // for decrease orders, initialCollateralDeltaAmount is the amount of the position's
     // collateralToken to withdraw
-    // for swaps, initialCollateralDeltaAmount is the amount of initialCollateralToken sent in for the swap
-    
-    // 对于 increase orders， 是用户发送的 collat​​ionToken 的 金额
-    // 对于 decrease orders,  是要从 position中 提取的 collat​​ionToken 的金额
-    // 对于 swaps, 是要送去 Swap 的 collat​​ionToken 的金额
-
+    // for swaps, initialCollateralDeltaAmount is the amount of initialCollateralToken sent
+    // in for the swap
     // @param orderType the order type
     // @param triggerPrice the trigger price for non-market orders
     // @param acceptablePrice the acceptable execution price for increase / decrease orders

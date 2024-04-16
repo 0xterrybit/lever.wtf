@@ -1,6 +1,6 @@
-# LeverWTF
+# GMX Synthetics
 
-Contracts for LeverWTF
+Contracts for GMX Synthetics.
 
 # General Overview
 
@@ -800,7 +800,10 @@ To run all tests:
 
 ```
 npx hardhat test
+
 ```
+
+`export NODE_OPTIONS=--max_old_space_size=4096` may be needed to run tests.
 
 To print code metrics:
 

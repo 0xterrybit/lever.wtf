@@ -504,7 +504,7 @@ library PositionUtils {
     }
 
     function updateFundingAndBorrowingState(
-        UpdatePositionParams memory params,
+        PositionUtils.UpdatePositionParams memory params,
         MarketUtils.MarketPrices memory prices
     ) internal {
         // update the funding amount per size for the market
@@ -535,7 +535,7 @@ library PositionUtils {
     }
 
     function updateTotalBorrowing(
-        UpdatePositionParams memory params,
+        PositionUtils.UpdatePositionParams memory params,
         uint256 nextPositionSizeInUsd,
         uint256 nextPositionBorrowingFactor
     ) internal {
@@ -556,7 +556,7 @@ library PositionUtils {
     // for funding fees, the funds are still credited to the owner
     // of the position indicated by order.account
     function incrementClaimableFundingAmount(
-        UpdatePositionParams memory params,
+        PositionUtils.UpdatePositionParams memory params,
         PositionPricingUtils.PositionFees memory fees
     ) internal {
         // if the position has negative funding fees, distribute it to allow it to be claimable
@@ -584,7 +584,7 @@ library PositionUtils {
     }
 
     function updateOpenInterest(
-        UpdatePositionParams memory params,
+        PositionUtils.UpdatePositionParams memory params,
         int256 sizeDeltaUsd,
         int256 sizeDeltaInTokens
     ) internal {
@@ -610,7 +610,7 @@ library PositionUtils {
     }
 
     function handleReferral(
-        UpdatePositionParams memory params,
+        PositionUtils.UpdatePositionParams memory params,
         PositionPricingUtils.PositionFees memory fees
     ) internal {
         ReferralUtils.incrementAffiliateReward(

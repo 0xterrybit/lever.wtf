@@ -13,16 +13,13 @@ import "../error/Errors.sol";
 // contracts, since these roles may be able to directly change DataStore values
 // or perform other sensitive operations, these contracts should make these calls
 // through ExternalHandler instead
-// 具有 CONTROLLER 角色或其他角色的合约可能需要调用外部 合约，
-// 因为这些角色可能能够直接更改 DataStore 值 或执行其他敏感操作，
-// 因此这些合约应该 通过ExternalHandler 进行这些调用
-
 //
-// note 任何人都可以让这个合约调用任何函数，应该注意这一点 
-// 以避免在任何协议中假设合约的状态 
-// 例如某些代币要求批准金额为零之前 
-// 可以更改批准金额，如果这些代币需要调用批准，则应考虑到这一点
-
+// note that anyone can make this contract call any function, this should be noted
+// to avoid assumptions of the contract's state in any protocol
+//
+// e.g. some tokens require the approved amount to be zero before the approved amount
+// can be changed, this should be taken into account if calling approve is required for
+// these tokens
 contract ExternalHandler is ReentrancyGuard {
     using Address for address;
     using SafeERC20 for IERC20;
@@ -42,7 +39,10 @@ contract ExternalHandler is ReentrancyGuard {
         }
 
         for (uint256 i; i < targets.length; i++) {
-            _makeExternalCall(targets[i], dataList[i]);
+            _makeExternalCall(
+                targets[i],
+                dataList[i]
+            );
         }
 
         for (uint256 i; i < refundTokens.length; i++) {

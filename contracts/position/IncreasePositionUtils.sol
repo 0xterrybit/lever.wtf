@@ -16,8 +16,6 @@ import "./PositionUtils.sol";
 import "./PositionEventUtils.sol";
 import "../order/BaseOrderUtils.sol";
 
-import "../market/MarketUtils.sol";
-
 // @title IncreasePositionUtils
 // @dev Library for functions to help with increasing a position
 library IncreasePositionUtils {
@@ -56,26 +54,16 @@ library IncreasePositionUtils {
     // size and borrowing factor. This function also applies fees to the position
     // and updates the market's liquidity pool based on the new position size.
     // @param params PositionUtils.UpdatePositionParams
-    // increasePosition 函数用于增加市场中头寸的规模。
-    // 这涉及更新头寸的抵押品金额， 
-    // 计算规模增加对价格的影响， 
-    // 以及更新 头寸的规模和借贷系数。 
-    // 此函数还会对头寸收取费用 
-    // 并根据新的头寸规模更新市场的流动性池。
-
     function increasePosition(
         PositionUtils.UpdatePositionParams memory params,
         uint256 collateralIncrementAmount
     ) external {
-
         // get the market prices for the given position
-        // 获取给定头寸的 市场价格
         MarketUtils.MarketPrices memory prices = MarketUtils.getMarketPrices(
             params.contracts.oracle,
             params.market
         );
 
-        // 分配位置影响
         MarketUtils.distributePositionImpactPool(
             params.contracts.dataStore,
             params.contracts.eventEmitter,
@@ -94,7 +82,6 @@ library IncreasePositionUtils {
         );
 
         if (params.position.sizeInUsd() == 0) {
-            
             params.position.setFundingFeeAmountPerSize(
                 MarketUtils.getFundingFeeAmountPerSize(
                     params.contracts.dataStore,
@@ -127,7 +114,6 @@ library IncreasePositionUtils {
 
         // process the collateral for the given position and order
         PositionPricingUtils.PositionFees memory fees;
-
         (cache.collateralDeltaAmount, fees) = processCollateral(
             params,
             cache.collateralTokenPrice,
@@ -142,7 +128,6 @@ library IncreasePositionUtils {
         ) {
             revert Errors.InsufficientCollateralAmount(params.position.collateralAmount(), cache.collateralDeltaAmount);
         }
-
         params.position.setCollateralAmount(Calc.sumReturnUint256(params.position.collateralAmount(), cache.collateralDeltaAmount));
 
         // if there is a positive impact, the impact pool amount should be reduced

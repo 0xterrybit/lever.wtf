@@ -103,8 +103,7 @@ library BaseOrderUtils {
     // @param orderType the order type
     // @return whether an orderType is a position order
     function isPositionOrder(Order.OrderType orderType) internal pure returns (bool) {
-        return  isIncreaseOrder(orderType) || 
-                isDecreaseOrder(orderType);
+        return isIncreaseOrder(orderType) || isDecreaseOrder(orderType);
     }
 
     // @dev check if an orderType is an increase order

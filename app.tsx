@@ -20,7 +20,7 @@ import en from "javascript-time-ago/locale/en.json";
 TimeAgo.addDefaultLocale(en);
 
 const { connectors } = getDefaultWallets({
-  appName: "LeverWTF",
+  appName: "GMX Synthetics",
   projectId: "gmx-synthetics",
   chains,
 });
@@ -36,7 +36,7 @@ import Signer from "./interface/Signer";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <h1>LeverWTF</h1>,
+    element: <h1>GMX Synthetics</h1>,
   },
   {
     path: "/signer",

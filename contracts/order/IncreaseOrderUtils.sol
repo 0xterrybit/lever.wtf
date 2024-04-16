@@ -4,11 +4,9 @@ pragma solidity ^0.8.0;
 
 import "./BaseOrderUtils.sol";
 import "../swap/SwapUtils.sol";
+import "../position/IncreasePositionUtils.sol";
 import "../order/OrderStoreUtils.sol";
 import "../callback/CallbackUtils.sol";
-
-import "../position/IncreasePositionUtils.sol";
-import "../position/PositionUtils.sol";
 
 // @title IncreaseOrderUtils
 // @dev Library for functions to help with processing an increase order
@@ -19,44 +17,31 @@ library IncreaseOrderUtils {
 
     // @dev process an increase order
     // @param params BaseOrderUtils.ExecuteOrderParams
-    function processOrder(BaseOrderUtils.ExecuteOrderParams memory params) 
-        external 
-        returns (EventUtils.EventLogData memory) 
-    {
-
+    function processOrder(BaseOrderUtils.ExecuteOrderParams memory params) external returns (EventUtils.EventLogData memory) {
         MarketUtils.validatePositionMarket(params.contracts.dataStore, params.market);
 
-        SwapUtils.SwapParams _params = SwapUtils.SwapParams(
-                params.contracts.dataStore,
-                params.contracts.eventEmitter,
-                params.contracts.oracle,
-                params.contracts.orderVault,
-                params.key,
-                params.order.initialCollateralToken(),
-                params.order.initialCollateralDeltaAmount(),
-                params.swapPathMarkets,
-                params.order.minOutputAmount(),
-                params.order.market(),
-                params.order.uiFeeReceiver(),
-                false
-            );
-            
-        (address collateralToken, uint256 collateralIncrementAmount) = SwapUtils.swap(_params);
+        (address collateralToken, uint256 collateralIncrementAmount) = SwapUtils.swap(SwapUtils.SwapParams(
+            params.contracts.dataStore,
+            params.contracts.eventEmitter,
+            params.contracts.oracle,
+            params.contracts.orderVault,
+            params.key,
+            params.order.initialCollateralToken(),
+            params.order.initialCollateralDeltaAmount(),
+            params.swapPathMarkets,
+            params.order.minOutputAmount(),
+            params.order.market(),
+            params.order.uiFeeReceiver(),
+            false
+        ));
 
         MarketUtils.validateMarketCollateralToken(params.market, collateralToken);
 
-        bytes32 positionKey = PositionUtils.getPositionKey(
-            params.order.account(), 
-            params.order.market(), 
-            collateralToken, 
-            params.order.isLong()
-        );
-
+        bytes32 positionKey = PositionUtils.getPositionKey(params.order.account(), params.order.market(), collateralToken, params.order.isLong());
         Position.Props memory position = PositionStoreUtils.get(params.contracts.dataStore, positionKey);
 
         // initialize position
         if (position.account() == address(0)) {
-            
             position.setAccount(params.order.account());
             if (position.market() != address(0) || position.collateralToken() != address(0)) {
                 revert Errors.UnexpectedPositionState();
@@ -74,7 +59,8 @@ library IncreaseOrderUtils {
             params.order.updatedAtBlock()
         );
 
-        UpdatePositionParams _params = PositionUtils.UpdatePositionParams(
+        IncreasePositionUtils.increasePosition(
+            PositionUtils.UpdatePositionParams(
                 params.contracts,
                 params.market,
                 params.order,
@@ -82,9 +68,9 @@ library IncreaseOrderUtils {
                 position,
                 positionKey,
                 params.secondaryOrderType
-            );
-
-        IncreasePositionUtils.increasePosition(_params, collateralIncrementAmount);
+            ),
+            collateralIncrementAmount
+        );
 
         EventUtils.EventLogData memory eventData;
         return eventData;

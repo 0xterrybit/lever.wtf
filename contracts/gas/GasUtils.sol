@@ -208,7 +208,6 @@ library GasUtils {
     // @param dataStore DataStore
     // @param order the order to estimate the gas limit for
     function estimateExecuteOrderGasLimit(DataStore dataStore, Order.Props memory order) internal view returns (uint256) {
-        
         if (BaseOrderUtils.isIncreaseOrder(order.orderType())) {
             return estimateExecuteIncreaseOrderGasLimit(dataStore, order);
         }
@@ -229,10 +228,7 @@ library GasUtils {
     // @param order the order to estimate the gas limit for
     function estimateExecuteIncreaseOrderGasLimit(DataStore dataStore, Order.Props memory order) internal view returns (uint256) {
         uint256 gasPerSwap = dataStore.getUint(Keys.singleSwapGasLimitKey());
-        
-        return dataStore.getUint(Keys.increaseOrderGasLimitKey()) + 
-                gasPerSwap * order.swapPath().length + 
-                order.callbackGasLimit();
+        return dataStore.getUint(Keys.increaseOrderGasLimitKey()) + gasPerSwap * order.swapPath().length + order.callbackGasLimit();
     }
 
     // @dev the estimated gas limit for decrease orders
@@ -248,16 +244,12 @@ library GasUtils {
         return dataStore.getUint(Keys.decreaseOrderGasLimitKey()) + gasPerSwap * swapCount + order.callbackGasLimit();
     }
 
-    // @dev 预计 Gas 限额 for swap orders
+    // @dev the estimated gas limit for swap orders
     // @param dataStore DataStore
     // @param order the order to estimate the gas limit for
     function estimateExecuteSwapOrderGasLimit(DataStore dataStore, Order.Props memory order) internal view returns (uint256) {
         uint256 gasPerSwap = dataStore.getUint(Keys.singleSwapGasLimitKey());
-
-        return dataStore.getUint(
-            Keys.swapOrderGasLimitKey()) + 
-            gasPerSwap * order.swapPath().length + 
-            order.callbackGasLimit();
+        return dataStore.getUint(Keys.swapOrderGasLimitKey()) + gasPerSwap * order.swapPath().length + order.callbackGasLimit();
     }
 
     function emitKeeperExecutionFee(
